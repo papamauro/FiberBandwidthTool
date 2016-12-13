@@ -1,0 +1,220 @@
+<!--
+    Awesome, your propel set up is nearly done! You just have to describe how you want your database to look like.
+
+    You can let propel set up your mysql database by running `vendor/bin/propel database:create && vendor/bin/propel database:insert-sql`.
+    This will create your database including all the tables.
+-->
+
+<!--
+    The root tag of the XML schema is the <database> tag.
+
+    The `name` attribute defines the name of the connection that Propel uses for the tables in this schema. It is not
+    necessarily the name of the actual database. In fact, Propel uses some configuration properties to link a connection
+    name with real connection settings (like database name, user and password).
+
+    The `defaultIdMethod` attribute indicates that the tables in this schema use the database's "native"
+    auto-increment/sequence features to handle id columns that are set to auto-increment.
+
+   [TIP]: You can define several schemas for a single project. Just make sure that each of the schema
+          filenames end with schema.xml.
+-->
+<database name="default" defaultIdMethod="native"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
+          namespace=""
+        >
+    <!-- Within the <database> tag, Propel expects one <table> tag for each table -->
+
+
+    <!--
+        Each table element should have a `name` attribute. It will be used for naming the sql table.
+
+        The `phpName` is the name that Propel will use for the generated PHP class. By default, Propel uses a
+        CamelCase version of the table name as its phpName - that means that you could omit the `phpName` attribute
+        on our `book` table.
+    -->
+    <table name="user" phpName="User">
+        <!--
+            Each column has a `name` (the one used by the database), and an optional `phpName` attribute. Once again,
+            the Propel default behavior is to use a CamelCase version of the name as `phpName` when not specified.
+
+            Each column also requires a `type`. The XML schema is database agnostic, so the column types and attributes
+            are probably not exactly the same as the one you use in your own database. But Propel knows how to map the
+            schema types with SQL types for many database vendors. Existing Propel column types are:
+            `boolean`, `tinyint`, `smallint`, `integer`, `bigint`, `double`, `float`, `real`, `decimal`, `char`,
+            `varchar`, `longvarchar`, `date`, `time`, `timestamp`, `blob`, `clob`, `object`, and `array`.
+
+            Some column types use a size (like `varchar` and `int`), some have unlimited size (`longvarchar`, `clob`,
+            `blob`).
+
+            Check the (schema reference)[http://propelorm.org/reference/schema.html] for more details
+            on each column type.
+
+            As for the other column attributes, `required`, `primaryKey`, and `autoIncrement`, they mean exactly
+            what their names imply.
+        -->
+        <column name="uid" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="company" type="varchar" size="255" required="true"/>
+        <column name="email" type="varchar" size="255" required="true"/>
+        <column name="username" type="varchar" size="255" required="true"/>
+        <column name="password" type="varchar" size="255" required="true"/>
+        <unique>
+            <unique-column name="username" />
+        </unique>
+    </table>
+
+    <table name="requests" phpName="Requests">
+        <column name="rid" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="completed" type="boolean"/>
+        <column name="date" type="timestamp"/>
+        <column name="resultup" type="integer"/>
+        <column name="resultdown" type="integer"/>
+        <column name="last_screen" type="integer"/>
+        <column name="avg" type="boolean"/>
+        <column name="ext_uid" type="integer"/>
+        <foreign-key foreignTable="user">
+            <reference local="ext_uid" foreign="uid"/>
+        </foreign-key>        
+    </table>
+    <table name="web" phpName="Web">
+        <column name="web_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="internal_web_server" type="boolean"/>
+        <column name="page_size" type="integer"/>
+        <column name="page_load_time" type="integer"/>
+        <column name="concorrent_requests" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>        
+    <table name="video" phpName="Video">
+        <column name="video_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="uso_video" type="boolean"/>
+        <column name="numero_partecipanti_entrata" type="integer"/>
+        <column name="numero_partecipanti_uscita" type="integer"/>
+        <column name="risoluzione" type="varchar" size="11"/>
+        <column name="dinamicita_immagine" type="integer"/>
+        <column name="fps" type="integer"/>
+        <column name="sessioni_contemporanee" type="integer"/>
+        <column name="ext_rid" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>
+        
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>       
+    <table name="generic" phpName="Generic">
+        <column name="generic_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="numero_postazioni" type="integer"/>
+        <column name="utilizzo_banda" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>
+        
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>
+    <table name="voip" phpName="Voip">
+        <column name="void_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="uso_voip" type="boolean"/>
+        <column name="telefonate_contemporanee" type="integer"/>
+        <column name="codec" type="integer"/>
+        <column name="compressed_rtp" type="boolean"/>
+        <column name="l2_protocol" type="varchar" size="11"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>        
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>    
+    <table name="security" phpName="Security">
+        <column name="security_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="use_security" type="boolean"/>
+        <column name="external_mediaserver" type="boolean"/>
+        <column name="remote_access" type="boolean"/>
+        <column name="number_camera" type="integer"/>
+        <column name="fps" type="integer"/>
+        <column name="resolution" type="varchar" size="11"/>
+        <column name="h264_profile" type="integer"/>
+        <column name="number_camera_viewed" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>        
+        <column name="view_resolution" type="varchar" size="11"/>
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>
+    <table name="remote" phpName="Remote">
+        <column name="remote_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="remote_used" type="boolean"/>
+        <column name="concurrent_access" type="integer"/>
+        <column name="remote_service" type="varchar" size="11"/>
+        <column name="citrix_br" type="boolean"/>
+        <column name="office_band" type="integer"/>
+        <column name="internet_band" type="integer"/> <!--Qui ci salvo i valori inseriti oppure quelli dell'altra tabella-->
+        <column name="printing_band" type="integer"/>
+        <column name="sd_video_band" type="integer"/>
+        <column name="hd_video_band" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>        
+        
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>
+    <table name="voipcodec" phpName="voipCodec">
+        <column name="id" type="varchar" size="3" required="true" primaryKey="true"/>
+        <column name="name" type="varchar" size="255" />
+        <column name="payload" type="integer"/>
+        <column name="bit_rate" type="integer"/>
+    </table>
+    <table name="remoteband" phpName="remoteBand">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="255" />
+        <column name="office" type="integer"/>
+        <column name="internet" type="integer"/> <!--Qui ci salvo i valori inseriti oppure quelli dell'altra tabella-->
+        <column name="printing" type="integer"/>
+        <column name="sd_video" type="integer"/>
+        <column name="hd_video" type="integer"/>
+    </table>
+    <table name="mail" phpName="Mail">
+        <column name="mail_id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="internal_mail_server" type="boolean"/>
+        <column name="mail_count" type="integer"/>
+        <column name="send_mail_latency" type="integer"/>
+        <column name="receive_mail_latency" type="integer"/>
+        <column name="average_received_mail" type="integer"/>
+        <column name="average_sended_mail" type="integer"/>
+        <column name="mail_size" type="integer"/>
+        <column name="up_bandwidth" type="integer"/>
+        <column name="down_bandwidth" type="integer"/>        
+        
+            <!--
+            A foreign key represents a relationship. Just like a table or a column, a relationship has a `phpName`.
+            By default, Propel uses the `phpName` of the foreign table as the `phpName` of the relation.
+
+            The `refPhpName` defines the name of the relation as seen from the foreign table.
+        -->
+        <column name="ext_rid" type="integer"/>
+        <foreign-key foreignTable="requests">
+            <reference local="ext_rid" foreign="rid"/>
+        </foreign-key>
+    </table>
+
+    <!--
+        When you're done with editing, open a terminal and run
+            `$ cd D:\Users\ninni\Documents\Development\WebWork\tesi`
+            `$ vendor/bin/propel build`
+        to generate the model classes.
+
+        You should now be able to perform basic crud operations with your models. To learn how to use these models
+        please look into our documentation: http://propelorm.org/documentation/03-basic-crud.html
+    -->
+</database>
